@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>EV 지도</title>
+
+
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/common/common.css}">
+    <link rel="stylesheet" th:href="@{/css/common/main.css}">
+
+<div th:replace="~{layout/header :: header}"></div>
+<script
+	src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=45ba50972b453c86407e783b76d96dbf"></script>
+<style>
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+.map-page-wrap {
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 200px); /* 80px → 200px로 변경 */
+	
+}
+
+.map-search-bar {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 24px;
+	background: #fff;
+	border-bottom: 1px solid #e5e7eb;
+	height: 60px;
+}
+
+.map-search-bar select {
+	padding: 8px 14px;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	font-size: 14px;
+	cursor: pointer;
+	min-width: 130px;
+}
+
+.map-search-bar button {
+	padding: 8px 20px;
+	background: #22c55e;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.btn-myloc {
+	background: #0a0f3c !important;
+}
+
+.map-content {
+	display: flex;
+	flex: 1;
+	overflow: hidden;
+}
+
+#map {
+	width: 70%;
+	height: 100%;
+}
+
+.map-panel {
+	width: 30%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	border-left: 1px solid #e5e7eb;
+	background: #fff;
+	overflow: hidden;
+}
+
+.station-detail {
+	flex: 0 0 60%;
+	padding: 20px;
+	border-bottom: 1px solid #e5e7eb;
+	overflow-y: auto;
+}
+
+.station-detail h3 {
+	font-size: 16px;
+	font-weight: 700;
+	margin-bottom: 16px;
+	color: #0a0f3c;
+	padding-bottom: 10px;
+	border-bottom: 2px solid #0a0f3c;
+}
+
+.station-detail-empty {
+	color: #9ca3af;
+	font-size: 14px;
+	text-align: center;
+	margin-top: 40px;
+}
+
+.detail-row {
+	display: flex;
+	padding: 8px 0;
+	border-bottom: 1px solid #f3f4f6;
+	font-size: 14px;
+}
+
+.detail-row .label {
+	color: #6b7280;
+	min-width: 80px;
+	font-weight: 500;
+}
+
+.detail-row .value {
+	color: #111;
+	flex: 1;
+}
+
+.charger-list {
+	flex: 1;
+	padding: 16px 20px;
+	overflow-y: auto;
+}
+
+.charger-list h3 {
+	font-size: 15px;
+	font-weight: 700;
+	margin-bottom: 12px;
+	color: #0a0f3c;
+}
+
+.charger-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 8px 12px;
+	border-radius: 8px;
+	background: #f9fafb;
+	margin-bottom: 8px;
+	font-size: 13px;
+}
+
+.charger-status {
+	padding: 3px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.status-available {
+	background: #dcfce7;
+	color: #16a34a;
+}
+
+.status-charging {
+	background: #fef9c3;
+	color: #ca8a04;
+}
+
+.status-broken {
+	background: #fee2e2;
+	color: #dc2626;
+}
+
+.status-unknown {
+	background: #f3f4f6;
+	color: #6b7280;
+}
+
+.charger-empty {
+	color: #9ca3af;
+	font-size: 13px;
+	text-align: center;
+	margin-top: 20px;
+}
+</style>
+</head>
+<body>
+
+
+	<div class="map-page-wrap">
+		<div class="map-search-bar">
+			<select id="sidoSelect" onchange="onSidoChange()">
+				<option value="">시/도 선택</option>
+			</select> <select id="sigunguSelect">
+				<option value="">시/군/구 선택</option>
+			</select>
+			<button onclick="searchByRegion()">검색</button>
+			<button class="btn-myloc" onclick="searchByMyLocation()">현재위치
+				검색</button>
+		</div>
+
+		<div class="map-content">
+			<div id="map"></div>
+
+			<div class="map-panel">
+				<div class="station-detail" id="stationDetail">
+					<h3>충전소 상세 정보</h3>
+					<p class="station-detail-empty">
+						충전소 마커를 클릭하면<br>상세 정보가 표시됩니다.
+					</p>
+				</div>
+				<div class="charger-list" id="chargerList">
+					<h3>충전기 목록</h3>
+					<p class="charger-empty">충전소를 선택해주세요.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="~{layout/footer :: footer}"></div>
+
+	<script>
+    const mapContainer = document.getElementById('map');
+    const mapOptions = {
+        center: new kakao.maps.LatLng(37.5665, 126.9780),
+        level: 8
+    };
+    const map = new kakao.maps.Map(mapContainer, mapOptions);
+    let markers = [];
+    let allRegions = {};
+
+    fetch('/charging/regions')
+        .then(r => r.json())
+        .then(data => {
+            allRegions = data;
+            const sidoSelect = document.getElementById('sidoSelect');
+            Object.keys(data).sort().forEach(sido => {
+                const opt = document.createElement('option');
+                opt.value = sido;
+                opt.textContent = sido;
+                sidoSelect.appendChild(opt);
+            });
+        });
+
+    function onSidoChange() {
+        const sido = document.getElementById('sidoSelect').value;
+        const sigunguSelect = document.getElementById('sigunguSelect');
+        sigunguSelect.innerHTML = '<option value="">시/군/구 선택</option>';
+        if (sido && allRegions[sido]) {
+            allRegions[sido].sort().forEach(sigungu => {
+                const opt = document.createElement('option');
+                opt.value = sigungu;
+                opt.textContent = sigungu;
+                sigunguSelect.appendChild(opt);
+            });
+        }
+    }
+
+    function searchByRegion() {
+        const sido = document.getElementById('sidoSelect').value;
+        const sigungu = document.getElementById('sigunguSelect').value;
+        if (!sido) { alert('시/도를 선택해주세요.'); return; }
+
+        fetch(`/charging/stations?sido=${encodeURIComponent(sido)}&sigungu=${encodeURIComponent(sigungu)}`)
+            .then(r => r.json())
+            .then(stations => showMarkers(stations));
+    }
+
+    function searchByMyLocation() {
+        if (!navigator.geolocation) { alert('위치 정보를 지원하지 않는 브라우저입니다.'); return; }
+        navigator.geolocation.getCurrentPosition(pos => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            map.setCenter(new kakao.maps.LatLng(lat, lng));
+            map.setLevel(5);
+        });
+    }
+
+    function showMarkers(stations) {
+        markers.forEach(m => m.setMap(null));
+        markers = [];
+
+        if (!stations || stations.length === 0) {
+            alert('해당 지역의 충전소가 없습니다.');
+            return;
+        }
+
+        const bounds = new kakao.maps.LatLngBounds();
+
+        stations.forEach(s => {
+            if (!s.lat || !s.lng) return;
+            const pos = new kakao.maps.LatLng(s.lat, s.lng);
+            const marker = new kakao.maps.Marker({ position: pos, map: map });
+            markers.push(marker);
+            bounds.extend(pos);
+            kakao.maps.event.addListener(marker, 'click', () => showDetail(s));
+        });
+
+        map.setBounds(bounds);
+    }
+
+    function showDetail(s) {
+        const detail = document.getElementById('stationDetail');
+        detail.innerHTML = `
+            <h3>충전소 상세 정보</h3>
+            <div class="detail-row"><span class="label">충전소명</span><span class="value">${s.stationName || '-'}</span></div>
+            <div class="detail-row"><span class="label">주소</span><span class="value">${s.address || '-'}</span></div>
+            <div class="detail-row"><span class="label">운영기관</span><span class="value">${s.operatorName || '-'}</span></div>
+            <div class="detail-row"><span class="label">연락처</span><span class="value">${s.operatorCall || '-'}</span></div>
+            <div class="detail-row"><span class="label">운영시간</span><span class="value">${s.useTime || '-'}</span></div>
+            <div class="detail-row"><span class="label">주차요금</span><span class="value">${s.parkingFree || '-'}</span></div>
+        `;
+
+        fetch(`/charging/chargers?stationId=${encodeURIComponent(s.stationId)}`)
+            .then(r => r.json())
+            .then(chargers => showChargers(chargers));
+    }
+
+    function showChargers(chargers) {
+        const list = document.getElementById('chargerList');
+        if (!chargers || chargers.length === 0) {
+            list.innerHTML = '<h3>충전기 목록</h3><p class="charger-empty">충전기 정보가 없습니다.</p>';
+            return;
+        }
+        let html = '<h3>충전기 목록</h3>';
+        chargers.forEach((c, i) => {
+        	 console.log("status 값:", c.status); // 🔥 이거 추가
+            html += `
+                <div class="charger-item">
+                    <span class="charger-type">${i+1}번 ${c.chargerType || '-'}</span>
+                    <span class="charger-status ${getStatusClass(c.status)}">${getStatusText(c.status)}</span>
+                </div>`;
+        });
+        list.innerHTML = html;
+    }
+
+    function getStatusClass(status) {
+        if (!status) return 'status-unknown';
+        if (status === '2') return 'status-available';
+        if (status === '3') return 'status-charging';
+        if (status === '9') return 'status-broken';
+        return 'status-unknown';
+    }
+
+    function getStatusText(status) {
+        if (!status) return '알 수 없음';
+
+        const s = String(status); // 🔥 핵심 (이거 없으면 계속 틀림)
+
+        if (s === '2') return '사용가능';
+        if (s === '3') return '충전중';
+        if (s === '4') return '운영중지';
+        if (s === '9') return '고장';
+
+        return s;
+    }
+</script>
+
+</body>
+</html>

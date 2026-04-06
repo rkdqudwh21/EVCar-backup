@@ -21,7 +21,6 @@ public class VehicleServiceImpl implements VehicleService {
         this.wishlistService = wishlistService;
     }
 
-    // 차량 리스트
     @Override
     public List<VehicleListDto> getVehicleList(String brand, String vehicleClass) {
 
@@ -41,14 +40,13 @@ public class VehicleServiceImpl implements VehicleService {
                     v.getCatalogUrl()
             );
 
-            dto.setWished(wishlistService.isWished(v.getVehicleId()));
+            dto.setWished(false);
 
             return dto;
 
         }).collect(Collectors.toList());
     }
 
-    // 차량 상세
     @Override
     public VehicleDetailDto getDetail(String vehicleId) {
 
@@ -67,12 +65,9 @@ public class VehicleServiceImpl implements VehicleService {
         dto.setFastChargingTime(v.getFastChargingTime());
         dto.setSlowChargingTime(v.getSlowChargingTime());
         dto.setChargingMethod(v.getChargingMethod());
-
-        // 🔥 여기만 수정 (null 방어)
         dto.setBatteryCapacity(
                 v.getBatteryCapacity() != null ? v.getBatteryCapacity().doubleValue() : 0.0
         );
-
         dto.setImageUrl(v.getImageUrl());
         dto.setCatalogUrl(v.getCatalogUrl());
 

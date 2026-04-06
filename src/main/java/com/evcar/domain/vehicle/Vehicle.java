@@ -57,8 +57,7 @@ public class Vehicle {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    @Column(name = "image_path", length = 50)
-    private String imagePath;
+  
 
     // Getters & Setters
     public String getVehicleId() { return vehicleId; }

@@ -1,7 +1,6 @@
-
 'use strict';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const wishlistGrid = document.getElementById('wishlistGrid');
     const wishlistEmpty = document.getElementById('wishlistEmpty');
     const wishlistMoreWrap = document.getElementById('wishlistMoreWrap');
@@ -11,194 +10,123 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const DEFAULT_VISIBLE_COUNT = 3;
-    let isExpanded = false;
+    let items = [];
+    let visibleCount = 6;
 
-    const getPreviewUserId = () => {
-        const params = new URLSearchParams(window.location.search);
-        return params.get('previewUserId');
-    };
-
-    const buildApiUrl = (basePath) => {
-        const previewUserId = getPreviewUserId();
-
-        if (!previewUserId) {
-            return basePath;
+    const formatPrice = (price) => {
+        if (price == null) {
+            return '가격 정보 없음';
         }
-
-        const query = new URLSearchParams({
-            previewUserId: previewUserId
-        });
-
-        return `${basePath}?${query.toString()}`;
+        return `${Number(price).toLocaleString('ko-KR')}만원`;
     };
 
-    const formatPrice = (priceBasic) => {
-        if (priceBasic === null || priceBasic === undefined || priceBasic === '') {
-            return '-';
-        }
+    const createCard = (item) => {
+        const article = document.createElement('article');
+        article.className = 'ev-wishlist-card';
 
-        const numericPrice = Number(priceBasic);
-        if (Number.isNaN(numericPrice)) {
-            return `${priceBasic}`;
-        }
+        const imageSrc = item.imageUrl && item.imageUrl.trim() !== ''
+            ? item.imageUrl
+            : '/images/evcar_logo.png';
 
-        return `${numericPrice.toLocaleString()}만원`;
-    };
+        article.innerHTML = `
+            <div class="ev-wishlist-card__image-wrap">
+                <img class="ev-wishlist-card__image" src="${imageSrc}" alt="${item.modelName}">
+            </div>
 
-    const escapeHtml = (value) => {
-        return String(value ?? '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-    };
+            <div class="ev-wishlist-card__body">
+                <p class="ev-wishlist-card__brand">${item.brand ?? ''}</p>
+                <h3 class="ev-wishlist-card__title">${item.modelName ?? ''}</h3>
+                <p class="ev-wishlist-card__class">${item.vehicleClass ?? ''}</p>
+                <p class="ev-wishlist-card__price">${formatPrice(item.priceBasic)}</p>
 
-    const createCardHtml = (item) => {
-        const brand = escapeHtml(item.brand);
-        const vehicleClass = escapeHtml(item.vehicleClass);
-        const modelName = escapeHtml(item.modelName);
-        const imageUrl = escapeHtml(item.imageUrl);
-        const detailUrl = escapeHtml(item.detailUrl);
-        const wishlistId = escapeHtml(item.wishlistId);
-        const priceText = escapeHtml(formatPrice(item.priceBasic));
-
-        return `
-            <article class="ev-wishlist-card" data-wishlist-id="${wishlistId}">
-                <button type="button" class="ev-wishlist-favorite" aria-label="관심차량 삭제">♥</button>
-                <div class="ev-wishlist-image-wrap">
-                    <img class="ev-wishlist-image" src="${imageUrl}" alt="${modelName}">
+                <div class="ev-wishlist-card__actions">
+                    <a class="btn btn-ev-primary" href="${item.detailUrl ?? '#'}">상세보기</a>
+                    <button type="button"
+                            class="btn btn-ev-danger"
+                            data-wishlist-id="${item.wishlistId}">
+                        삭제
+                    </button>
                 </div>
-                <div class="ev-wishlist-body">
-                    <p class="ev-wishlist-brand">${brand} | ${vehicleClass}</p>
-                    <h2 class="ev-wishlist-model">${modelName}</h2>
-                    <p class="ev-wishlist-price">${priceText}</p>
-                    <div class="ev-wishlist-actions">
-                        <a href="${detailUrl}" class="btn btn-ev-secondary">상세보기</a>
-                        <button type="button" class="btn btn-ev-primary ev-delete-btn">삭제</button>
-                    </div>
-                </div>
-            </article>
+            </div>
         `;
-    };
 
-    const renderEmptyState = (wishlist) => {
-        const isEmpty = wishlist.length === 0;
-        wishlistGrid.style.display = isEmpty ? 'none' : 'grid';
-        wishlistEmpty.classList.toggle('ev-wishlist-empty--hidden', !isEmpty);
-    };
+        const deleteButton = article.querySelector('[data-wishlist-id]');
+        deleteButton.addEventListener('click', async () => {
+            const wishlistId = deleteButton.getAttribute('data-wishlist-id');
 
-    const renderMoreButton = (wishlist) => {
-        const shouldShowMoreButton = wishlist.length > DEFAULT_VISIBLE_COUNT;
-        wishlistMoreWrap.classList.toggle('ev-wishlist-more--hidden', !shouldShowMoreButton);
+            if (!wishlistId) {
+                alert('관심차량 식별값이 없습니다.');
+                return;
+            }
 
-        if (shouldShowMoreButton) {
-            wishlistMoreButton.textContent = isExpanded ? '접기' : '더보기';
-        }
-    };
+            if (!confirm('관심 차량에서 삭제하시겠습니까?')) {
+                return;
+            }
 
-    const getWishlistFromServer = async () => {
-        const response = await fetch(buildApiUrl('/mypage/wishlist/api'), {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
+            try {
+                const response = await fetch('/mypage/wishlist/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
+                    body: new URLSearchParams({ wishlistId })
+                });
+
+                if (!response.ok) {
+                    throw new Error('삭제 요청 실패');
+                }
+
+                items = items.filter((wishlistItem) => wishlistItem.wishlistId !== wishlistId);
+                render();
+            } catch (error) {
+                console.error(error);
+                alert('관심 차량 삭제 중 오류가 발생했습니다.');
             }
         });
 
-        if (!response.ok) {
-            throw new Error('관심 차량 목록 조회에 실패했습니다.');
-        }
-
-        return await response.json();
+        return article;
     };
 
-    const removeWishlistFromServer = async (wishlistId) => {
-        const response = await fetch(buildApiUrl('/mypage/wishlist/delete'), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                wishlistId: String(wishlistId)
-            })
-        });
+    const render = () => {
+        wishlistGrid.innerHTML = '';
 
-        if (!response.ok) {
-            throw new Error('관심 차량 삭제에 실패했습니다.');
-        }
-    };
-
-    const getWishlist = async () => {
-        return await getWishlistFromServer();
-    };
-
-    const removeWishlistItem = async (wishlistId) => {
-        await removeWishlistFromServer(wishlistId);
-    };
-
-    const bindEvents = () => {
-        const deleteButtons = wishlistGrid.querySelectorAll('.ev-delete-btn');
-        deleteButtons.forEach((button) => {
-            button.addEventListener('click', async (event) => {
-                const card = event.target.closest('.ev-wishlist-card');
-                await handleDelete(card);
-            });
-        });
-
-        const favoriteButtons = wishlistGrid.querySelectorAll('.ev-wishlist-favorite');
-        favoriteButtons.forEach((button) => {
-            button.addEventListener('click', async (event) => {
-                const card = event.target.closest('.ev-wishlist-card');
-                await handleDelete(card);
-            });
-        });
-    };
-
-    const renderWishlist = async () => {
-        const wishlist = await getWishlist();
-        const visibleWishlist = isExpanded ? wishlist : wishlist.slice(0, DEFAULT_VISIBLE_COUNT);
-
-        wishlistGrid.innerHTML = visibleWishlist.map(createCardHtml).join('');
-        renderEmptyState(wishlist);
-        renderMoreButton(wishlist);
-        bindEvents();
-    };
-
-    const handleDelete = async (card) => {
-        if (!card) {
+        if (!items.length) {
+            wishlistEmpty.classList.remove('ev-wishlist-empty--hidden');
+            wishlistMoreWrap.classList.add('ev-wishlist-more--hidden');
             return;
         }
 
-        const wishlistId = card.dataset.wishlistId;
+        wishlistEmpty.classList.add('ev-wishlist-empty--hidden');
 
-        if (!wishlistId) {
-            window.alert('관심 차량 식별값이 없습니다.');
-            return;
+        const visibleItems = items.slice(0, visibleCount);
+        visibleItems.forEach((item) => {
+            wishlistGrid.appendChild(createCard(item));
+        });
+
+        if (items.length > visibleCount) {
+            wishlistMoreWrap.classList.remove('ev-wishlist-more--hidden');
+        } else {
+            wishlistMoreWrap.classList.add('ev-wishlist-more--hidden');
         }
-
-        const confirmed = window.confirm('관심차량에서 삭제하시겠습니까?');
-        if (!confirmed) {
-            return;
-        }
-
-        await removeWishlistItem(wishlistId);
-
-        const updatedWishlist = await getWishlist();
-        if (updatedWishlist.length <= DEFAULT_VISIBLE_COUNT) {
-            isExpanded = false;
-        }
-
-        await renderWishlist();
     };
 
-    wishlistMoreButton.addEventListener('click', async () => {
-        isExpanded = !isExpanded;
-        await renderWishlist();
+    wishlistMoreButton.addEventListener('click', () => {
+        visibleCount += 6;
+        render();
     });
 
-    renderWishlist().catch(() => {
-        window.alert('관심 차량 정보를 불러오는 중 오류가 발생했습니다.');
-    });
+    try {
+        const response = await fetch('/mypage/wishlist/api');
+        if (!response.ok) {
+            throw new Error('목록 조회 실패');
+        }
 
+        items = await response.json();
+        render();
+    } catch (error) {
+        console.error(error);
+        wishlistGrid.innerHTML = '';
+        wishlistEmpty.classList.remove('ev-wishlist-empty--hidden');
+        wishlistMoreWrap.classList.add('ev-wishlist-more--hidden');
+    }
 });

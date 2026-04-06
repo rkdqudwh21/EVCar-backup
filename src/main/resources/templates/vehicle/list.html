@@ -5,286 +5,311 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>전기차 조회 - EV Consulting</title>
 <link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-	rel="stylesheet">
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet">
 <style>
 body {
-	background: #f5f6f8;
-	
+    background: #f5f6f8;
 }
 
 .navbar {
-	background: #1a2340;
+    background: #1a2340;
 }
 
 .navbar-brand {
-	color: #fff !important;
-	font-weight: 700;
-	font-size: 1rem;
-	line-height: 1.2;
+    color: #fff !important;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.2;
 }
 
 .nav-link {
-	color: #d0d8e8 !important;
-	font-size: 0.9rem;
+    color: #d0d8e8 !important;
+    font-size: 0.9rem;
 }
 
 .nav-link:hover {
-	color: #fff !important;
+    color: #fff !important;
 }
 
 .filter-label {
-	font-weight: 600;
-	font-size: 0.85rem;
-	color: #333;
-	min-width: 50px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #333;
+    min-width: 50px;
 }
 
 .filter-btn {
-	border: 1px solid #ccc;
-	background: #fff;
-	color: #555;
-	border-radius: 4px;
-	padding: 4px 14px;
-	font-size: 0.82rem;
-	cursor: pointer;
-	transition: all 0.15s;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #555;
+    border-radius: 4px;
+    padding: 4px 14px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.15s;
 }
 
 .filter-btn:hover {
-	background: #e8eaf6;
-	border-color: #5c6bc0;
+    background: #e8eaf6;
+    border-color: #5c6bc0;
 }
 
 .filter-btn.active {
-	background: #3f51b5;
-	color: #fff;
-	border-color: #3f51b5;
+    background: #3f51b5;
+    color: #fff;
+    border-color: #3f51b5;
 }
 
 .vehicle-card {
-	background: #fff;
-	border: 1px solid #e0e0e0;
-	border-radius: 8px;
-	overflow: hidden;
-	cursor: pointer;
-	transition: box-shadow 0.2s;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
 }
 
 .vehicle-card:hover {
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .vehicle-img-box {
-	width: 100%;
-	height: 250px;
-	background: #f0f0f0;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	overflow: hidden;
+    width: 100%;
+    height: 250px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
 }
 
 .vehicle-img-box img {
-	width: 100%;
-	height: 250px;
-	object-fit: cover;
-	
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
 }
 
 .card-body-inner {
-	padding: 12px 14px 14px;
+    padding: 12px 14px 14px;
 }
 
 .card-brand {
-	font-size: 0.75rem;
-	color: #888;
-	margin-bottom: 2px;
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 2px;
 }
 
 .card-model {
-	font-size: 1rem;
-	font-weight: 700;
-	color: #1a2340;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a2340;
 }
 
 .card-price {
-	font-size: 0.85rem;
-	color: #3f51b5;
-	margin-top: 4px;
+    font-size: 0.85rem;
+    color: #3f51b5;
+    margin-top: 4px;
+    margin-bottom: 10px;
 }
 
 .result-header {
-	font-size: 0.9rem;
-	color: #555;
+    font-size: 0.9rem;
+    color: #555;
 }
 
 .result-header strong {
-	color: #1a2340;
+    color: #1a2340;
 }
 
 .ai-fab {
-	position: fixed;
-	bottom: 32px;
-	right: 32px;
-	width: 56px;
-	height: 56px;
-	border-radius: 50%;
-	background: #3f51b5;
-	color: #fff;
-	border: none;
-	font-size: 0.85rem;
-	font-weight: 700;
-	box-shadow: 0 4px 12px rgba(63, 81, 181, 0.45);
-	cursor: pointer;
-	z-index: 1000;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #3f51b5;
+    color: #fff;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(63, 81, 181, 0.45);
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .ai-fab:hover {
-	background: #303f9f;
+    background: #303f9f;
 }
 
 .empty-result {
-	text-align: center;
-	padding: 60px 0;
-	color: #aaa;
+    text-align: center;
+    padding: 60px 0;
+    color: #aaa;
+}
+
+.wishlist-form {
+    margin-top: 10px;
+}
+
+.wishlist-btn {
+    width: 100%;
 }
 </style>
 </head>
 <body>
+    <!-- 네비게이션 -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="#">EV<br>Consulting</a>
+            <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav mx-auto gap-4">
+                    <li class="nav-item"><a class="nav-link" href="#">회사소개</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/vehicle">전기차조회</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">충전소지도</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">고객센터</a></li>
+                </ul>
+                <a class="nav-link" href="#">로그인</a>
+            </div>
+        </div>
+    </nav>
 
-	<!-- 네비게이션 -->
-	<nav class="navbar navbar-expand-lg">
-		<div class="container-fluid px-4">
-			<a class="navbar-brand" href="#">EV<br>Consulting
-			</a>
-			<button class="navbar-toggler" type="button"
-				data-bs-toggle="collapse" data-bs-target="#navMenu">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navMenu">
-				<ul class="navbar-nav mx-auto gap-4">
-					<li class="nav-item"><a class="nav-link" href="#">회사소개</a></li>
-					<li class="nav-item"><a class="nav-link active"
-						href="/vehicle">전기차조회</a></li>
-					<li class="nav-item"><a class="nav-link" href="#">충전소지도</a></li>
-					<li class="nav-item"><a class="nav-link" href="#">고객센터</a></li>
-				</ul>
-				<a class="nav-link" href="#">로그인</a>
-			</div>
-		</div>
-	</nav>
+    <div class="container-fluid px-4 py-3">
 
-	<div class="container-fluid px-4 py-3">
+        <h2 class="fw-bold mb-3" style="font-size: 1.4rem;">전기차 조회</h2>
 
-		<h2 class="fw-bold mb-3" style="font-size: 1.4rem;">전기차 조회</h2>
+        <!-- 브랜드 필터 -->
+        <div class="bg-white px-3 py-2 mb-2 rounded border">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="filter-label">브랜드</span>
+                <button type="button" class="filter-btn"
+                    th:each="brand : ${ {'전체','현대','기아'} }"
+                    th:text="${brand}"
+                    th:classappend="${brand == selectedBrand} ? ' active'"
+                    th:data-brand="${brand}"
+                    th:data-class="${selectedClass}"
+                    onclick="filterByData(this)">
+                </button>
+            </div>
+        </div>
 
-		<!-- 브랜드 필터 -->
-		<div class="bg-white px-3 py-2 mb-2 rounded border">
-			<div class="d-flex align-items-center gap-2 flex-wrap">
-				<span class="filter-label">브랜드</span>
-				<button type="button" class="filter-btn"
-					th:each="brand : ${ {'전체','현대','기아'} }" th:text="${brand}"
-					th:classappend="${brand == selectedBrand} ? ' active'"
-					th:data-brand="${brand}" th:data-class="${selectedClass}"
-					onclick="filterByData(this)"></button>
-			</div>
-		</div>
+        <!-- 차급 필터 -->
+        <div class="bg-white px-3 py-2 mb-3 rounded border">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="filter-label">차급</span>
+                <button type="button" class="filter-btn"
+                    th:each="vc : ${ {'전체','경형','경형SUV','소형SUV','중형SUV','대형SUV','세단','고성능'} }"
+                    th:text="${vc}"
+                    th:classappend="${vc == selectedClass} ? ' active'"
+                    th:data-brand="${selectedBrand}"
+                    th:data-class="${vc}"
+                    onclick="filterByData(this)">
+                </button>
+            </div>
+        </div>
 
-		<!-- 차급 필터 -->
-		<div class="bg-white px-3 py-2 mb-3 rounded border">
-			<div class="d-flex align-items-center gap-2 flex-wrap">
-				<span class="filter-label">차급</span>
-				<button type="button" class="filter-btn"
-					th:each="vc : ${ {'전체','경형','경형SUV','소형SUV','중형SUV','대형SUV','세단','고성능'} }"
-					th:text="${vc}" th:classappend="${vc == selectedClass} ? ' active'"
-					th:data-brand="${selectedBrand}" th:data-class="${vc}"
-					onclick="filterByData(this)"></button>
-			</div>
-		</div>
+        <!-- 결과 건수 -->
+        <div class="result-header mb-3">
+            조회 결과 <strong th:text="${totalCount}">0</strong>건
+        </div>
 
-		<!-- 결과 건수 -->
-		<div class="result-header mb-3">
-			조회 결과 <strong th:text="${totalCount}">0</strong>건
-		</div>
+        <!-- 차량 카드 목록 -->
+        <div class="row g-3">
 
-		<!-- 차량 카드 목록 -->
-		<div class="row g-3">
+            <!-- 결과 없을 때 -->
+            <div class="col-12 text-center text-muted py-5"
+                th:if="${#lists.isEmpty(vehicleList)}">
+                조회된 차량이 없습니다.
+            </div>
 
-			<!-- 결과 없을 때 -->
-			<div class="col-12 text-center text-muted py-5"
-				th:if="${#lists.isEmpty(vehicleList)}">조회된 차량이 없습니다.</div>
+            <!-- 차량 카드 -->
+            <div class="col-12 col-sm-6 col-md-4 col-lg-4"
+                th:each="v : ${vehicleList}">
+                <div class="vehicle-card">
 
-			<!-- 차량 카드 -->
-			<div class="col-12 col-sm-6 col-md-4 col-lg-4"
-				th:each="v : ${vehicleList}">
-				<div class="vehicle-card" th:data-id="${v.vehicleId}"
-					onclick="goDetail(this)">
+                    <!-- 이미지 -->
+                    <div class="vehicle-img-box"
+                        th:data-id="${v.vehicleId}"
+                        onclick="goDetail(this)">
+                        <img th:src="${v.imageUrl}" th:alt="${v.modelName}"
+                            onerror="this.src='/images/evcar_logo.png'">
+                    </div>
 
-					<!-- 이미지 -->
-					<div class="vehicle-img-box">
-						<img th:src="${v.imageUrl}" th:alt="${v.modelName}"
-							onerror="this.src='/images/evcar_logo.png'">
-					</div>
+                    <!-- 카드 정보 -->
+                    <div class="card-body-inner">
+                        <div class="card-brand" th:text="${v.brand}">브랜드</div>
+                        <div class="card-model" th:text="${v.modelName}">모델명</div>
+                        <div class="card-price" th:text="${v.priceBasicFormatted}">가격</div>
 
-					<!-- 카드 정보 -->
-					<div class="card-body-inner">
-						<div class="card-brand" th:text="${v.brand}">브랜드</div>
-						<div class="card-model" th:text="${v.modelName}">모델명</div>
-						<div class="card-price" th:text="${v.priceBasicFormatted}">가격</div>
-					</div>
+                        <form class="wishlist-form" th:action="@{/wishlist/add}" method="post">
+                            <input type="hidden" name="vehicleId" th:value="${v.vehicleId}">
+                            <button type="submit" class="btn btn-outline-primary btn-sm wishlist-btn">
+                                관심차량 추가
+                            </button>
+                        </form>
+                    </div>
 
-				</div>
-			</div>
+                </div>
+            </div>
 
-		</div>
+        </div>
 
-		<!-- 페이지네이션 -->
-		<div class="d-flex justify-content-center mt-4 gap-2"
-			th:if="${totalPages > 1}">
-			<button type="button" class="filter-btn"
-				th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-				th:text="${i + 1}" th:classappend="${i == currentPage} ? ' active'"
-				th:data-brand="${selectedBrand}" th:data-class="${selectedClass}"
-				th:data-page="${i}" onclick="goPage(this)"></button>
-		</div>
+        <!-- 페이지네이션 -->
+        <div class="d-flex justify-content-center mt-4 gap-2"
+            th:if="${totalPages > 1}">
+            <button type="button" class="filter-btn"
+                th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:text="${i + 1}"
+                th:classappend="${i == currentPage} ? ' active'"
+                th:data-brand="${selectedBrand}"
+                th:data-class="${selectedClass}"
+                th:data-page="${i}"
+                onclick="goPage(this)">
+            </button>
+        </div>
 
-	</div>
+    </div>
 
-	<!-- 푸터 -->
-	<footer class="text-center py-3 mt-5"
-		style="background: #1a2340; color: #aaa; font-size: 0.8rem;">
-		개인정보처리방침 / 이용약관 </footer>
+    <!-- 푸터 -->
+    <footer class="text-center py-3 mt-5"
+        style="background: #1a2340; color: #aaa; font-size: 0.8rem;">
+        개인정보처리방침 / 이용약관
+    </footer>
 
-	<!-- AI 플로팅 버튼 -->
-	<button class="ai-fab" onclick="alert('AI 챗봇 준비 중입니다.')">AI</button>
+    <!-- AI 플로팅 버튼 -->
+    <button class="ai-fab" onclick="alert('AI 챗봇 준비 중입니다.')">AI</button>
 
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-	<script>
-		function filterByData(btn) {
-			const brand = btn.getAttribute('data-brand');
-			const vehicleClass = btn.getAttribute('data-class');
-			location.href = '/vehicle/list?brand=' + encodeURIComponent(brand)
-					+ '&vehicleClass=' + encodeURIComponent(vehicleClass);
-		}
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function filterByData(btn) {
+            const brand = btn.getAttribute('data-brand');
+            const vehicleClass = btn.getAttribute('data-class');
+            location.href = '/vehicle/list?brand=' + encodeURIComponent(brand)
+                    + '&vehicleClass=' + encodeURIComponent(vehicleClass);
+        }
 
-		function goDetail(card) {
-			const id = card.getAttribute('data-id');
-			location.href = '/vehicle/' + id;
-		}
+        function goDetail(card) {
+            const id = card.getAttribute('data-id');
+            location.href = '/vehicle/' + id;
+        }
 
-		function goPage(btn) {
-			const brand = btn.getAttribute('data-brand');
-			const vehicleClass = btn.getAttribute('data-class');
-			const page = btn.getAttribute('data-page');
-			location.href = '/vehicle/list?brand=' + encodeURIComponent(brand)
-					+ '&vehicleClass=' + encodeURIComponent(vehicleClass)
-					+ '&page=' + page;
-		}
-	</script>
+        function goPage(btn) {
+            const brand = btn.getAttribute('data-brand');
+            const vehicleClass = btn.getAttribute('data-class');
+            const page = btn.getAttribute('data-page');
+            location.href = '/vehicle/list?brand=' + encodeURIComponent(brand)
+                    + '&vehicleClass=' + encodeURIComponent(vehicleClass)
+                    + '&page=' + page;
+        }
+    </script>
 </body>
 </html>

@@ -33,6 +33,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.springframework.security:spring-security-crypto'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -43,7 +44,9 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'com.h2database:h2'
 }
-
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-parameters']
+}
 tasks.named('test') {
 	useJUnitPlatform()
 }

@@ -1,17 +1,14 @@
 package com.evcar.controller.vehicle;
 
-import java.util.List;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.evcar.service.vehicle.WishlistService;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import com.evcar.dto.vehicle.VehicleListDto;
-import com.evcar.service.vehicle.WishlistService;
-import lombok.RequiredArgsConstructor;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/wishlist")
 public class WishlistController {
@@ -19,24 +16,28 @@ public class WishlistController {
     private final WishlistService wishlistService;
 
     @PostMapping("/add")
-    public String add(@RequestParam String vehicleId) {   
-        wishlistService.add(vehicleId);
-        return "ok";
+    public String add(HttpSession session,
+                      @RequestParam("vehicleId") String vehicleId) {
+
+        Object userId = session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        wishlistService.addWishlist(String.valueOf(userId), vehicleId);
+        return "redirect:/vehicle/list";
     }
 
     @PostMapping("/delete")
-    public String delete(@RequestParam String vehicleId) {  
-        wishlistService.remove(vehicleId);
-        return "ok";
-    }
-    
-    @GetMapping("/list")
-    public String wishlistPage(Model model) {
+    public String delete(HttpSession session,
+                         @RequestParam("vehicleId") String vehicleId) {
 
-        List<VehicleListDto> list = wishlistService.getWishlistVehicles();
+        Object userId = session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
 
-        model.addAttribute("vehicleList", list);
-
-        return "wishlist/list";
+        wishlistService.removeWishlist(String.valueOf(userId), vehicleId);
+        return "redirect:/vehicle/list";
     }
 }

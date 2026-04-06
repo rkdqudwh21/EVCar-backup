@@ -7,6 +7,4 @@ import com.evcar.dto.vehicle.VehicleListDto;
 public interface VehicleService {
     List<VehicleListDto> getVehicleList(String brand, String vehicleClass);
     VehicleDetailDto getDetail(String vehicleId);
-    
-    
 }

@@ -1,63 +1,73 @@
 package com.evcar.service.vehicle;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.evcar.domain.vehicle.Wishlist;
 import com.evcar.dto.vehicle.VehicleListDto;
 import com.evcar.repository.vehicle.VehicleRepository;
 import com.evcar.repository.vehicle.WishlistRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class WishlistServiceImpl implements WishlistService {
 
     private final WishlistRepository wishlistRepository;
     private final VehicleRepository vehicleRepository;
 
     @Override
-    public boolean isWished(String vehicleId) {
-        return wishlistRepository.existsByVehicleId(vehicleId);
+    public boolean isWished(String userId, String vehicleId) {
+        return wishlistRepository.existsByUserIdAndVehicleId(userId, vehicleId);
     }
 
     @Override
-    public void add(String vehicleId) {
-        if (!wishlistRepository.existsByVehicleId(vehicleId)) {
-            Wishlist w = new Wishlist();
-            w.setVehicleId(vehicleId);
-            wishlistRepository.save(w);
+    public void addWishlist(String userId, String vehicleId) {
+        if (wishlistRepository.existsByUserIdAndVehicleId(userId, vehicleId)) {
+            return;
         }
+
+        Wishlist wishlist = new Wishlist();
+        wishlist.setWishlistId(UUID.randomUUID().toString());
+        wishlist.setUserId(userId);
+        wishlist.setVehicleId(vehicleId);
+        wishlist.setCreatedAt(LocalDateTime.now());
+
+        wishlistRepository.save(wishlist);
     }
 
     @Override
-    public void remove(String vehicleId) {
-        if (wishlistRepository.existsByVehicleId(vehicleId)) {
-            wishlistRepository.deleteByVehicleId(vehicleId);
+    public void removeWishlist(String userId, String vehicleId) {
+        wishlistRepository.findByUserIdAndVehicleId(userId, vehicleId)
+                .ifPresent(wishlistRepository::delete);
+    }
+
+    @Override
+    public List<VehicleListDto> getWishlistVehicles(String userId) {
+        List<Wishlist> wishlists = wishlistRepository.findByUserId(userId);
+        List<VehicleListDto> result = new ArrayList<>();
+
+        for (Wishlist wishlist : wishlists) {
+            vehicleRepository.findById(wishlist.getVehicleId()).ifPresent(vehicle -> {
+                VehicleListDto dto = new VehicleListDto(
+                        vehicle.getVehicleId(),
+                        vehicle.getBrand(),
+                        vehicle.getModelName(),
+                        vehicle.getVehicleClass(),
+                        vehicle.getPriceBasic(),
+                        vehicle.getPricePremium(),
+                        vehicle.getDrivingRange(),
+                        vehicle.getImageUrl(),
+                        vehicle.getCatalogUrl()
+                );
+                dto.setWished(true);
+                result.add(dto);
+            });
         }
-    }
 
-    @Override
-    public List<VehicleListDto> getWishlistVehicles() {
-        List<Wishlist> wishlist = wishlistRepository.findAll();
-
-        return wishlist.stream()
-                .map(w -> {
-                    // vehicle 정보 조회
-                    var vehicle = vehicleRepository.findById(w.getVehicleId()).orElse(null);
-
-                    if (vehicle == null) return null;
-
-                    // DTO 변환 (필드 맞게 수정 필요)
-                    VehicleListDto dto = new VehicleListDto();
-                    dto.setBrand(vehicle.getBrand());
-                    dto.setModelName(vehicle.getModelName()); // 필드명 맞게 수정
-                    
-                    return dto;
-                })
-                .filter(v -> v != null)
-                .collect(Collectors.toList());
+        return result;
     }
 }

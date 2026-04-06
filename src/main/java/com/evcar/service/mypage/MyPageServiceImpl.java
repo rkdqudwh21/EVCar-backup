@@ -3,7 +3,7 @@ package com.evcar.service.mypage;
 import com.evcar.domain.consultation.Consultation;
 import com.evcar.domain.inquiry.Inquiry;
 import com.evcar.domain.user.User;
-
+import com.evcar.domain.vehicle.Wishlist;
 import com.evcar.dto.mypage.MyConsultationResponseDto;
 import com.evcar.dto.mypage.MyInquiryResponseDto;
 import com.evcar.dto.mypage.MyPageInfoResponseDto;
@@ -13,8 +13,9 @@ import com.evcar.dto.mypage.MyWishlistResponseDto;
 import com.evcar.dto.mypage.WithdrawRequestDto;
 import com.evcar.repository.consultation.ConsultationRepository;
 import com.evcar.repository.inquiry.InquiryRepository;
-import com.evcar.repository.mypage.MyWishlistQueryRepository;
 import com.evcar.repository.user.UserRepository;
+import com.evcar.repository.vehicle.VehicleRepository;
+import com.evcar.repository.vehicle.WishlistRepository;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.ZoneId;
@@ -35,7 +36,8 @@ public class MyPageServiceImpl implements MyPageService {
     private final UserRepository userRepository;
     private final ConsultationRepository consultationRepository;
     private final InquiryRepository inquiryRepository;
-    private final MyWishlistQueryRepository myWishlistQueryRepository;
+    private final WishlistRepository wishlistRepository;
+    private final VehicleRepository vehicleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -196,7 +198,21 @@ public class MyPageServiceImpl implements MyPageService {
     @Override
     public List<MyWishlistResponseDto> getMyWishlist(String userId) {
         getUserByUserId(userId);
-        return myWishlistQueryRepository.findMyWishlistByUserId(userId);
+
+        return wishlistRepository.findByUserId(userId).stream()
+                .map(wishlist -> vehicleRepository.findById(wishlist.getVehicleId())
+                        .map(vehicle -> MyWishlistResponseDto.builder()
+                                .wishlistId(wishlist.getWishlistId())
+                                .brand(vehicle.getBrand())
+                                .modelName(vehicle.getModelName())
+                                .vehicleClass(vehicle.getVehicleClass())
+                                .priceBasic(vehicle.getPriceBasic())
+                                .imageUrl(vehicle.getImageUrl())
+                                .detailUrl("/vehicle/" + vehicle.getVehicleId())
+                                .build())
+                        .orElse(null))
+                .filter(java.util.Objects::nonNull)
+                .toList();
     }
 
     @Override
@@ -208,7 +224,14 @@ public class MyPageServiceImpl implements MyPageService {
             throw new IllegalArgumentException("관심차량 식별값이 없습니다.");
         }
 
-        myWishlistQueryRepository.deleteMyWishlistByUserIdAndWishlistId(userId, wishlistId);
+        Wishlist wishlist = wishlistRepository.findById(wishlistId)
+                .orElseThrow(() -> new IllegalArgumentException("관심차량 정보를 찾을 수 없습니다."));
+
+        if (!wishlist.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("본인의 관심차량만 삭제할 수 있습니다.");
+        }
+
+        wishlistRepository.delete(wishlist);
     }
 
     private User getUserByUserId(String userId) {

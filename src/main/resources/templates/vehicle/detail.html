@@ -54,6 +54,9 @@ body {
 	overflow: hidden;
 	border-radius: 16px;
 	background: #ddd;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .slide-img {
@@ -61,10 +64,11 @@ body {
 	height: 100%;
 	object-fit: cover;
 	transition: transform 0.5s ease;
+	display: block;
 }
 
-.carousel-item:hover .slide-img {
-	transform: scale(1.05);
+.slide-img:hover {
+	transform: scale(1.03);
 }
 
 /* 오버레이 */
@@ -76,6 +80,21 @@ body {
 	width: 100%;
 	height: 40%;
 	background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
+	pointer-events: none;
+}
+
+/* 이미지 없을 때 */
+.image-empty {
+	width: 100%;
+	height: 100%;
+	min-height: 450px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 20px;
+	font-weight: 600;
+	color: #666;
+	background: linear-gradient(180deg, #e7e7e7 0%, #cfcfcf 100%);
 }
 
 /* 썸네일 */
@@ -91,11 +110,6 @@ body {
 	object-fit: cover;
 	border-radius: 8px;
 	cursor: pointer;
-	opacity: 0.6;
-	transition: all 0.3s;
-}
-
-.thumbnail-img:hover, .thumbnail-img.active {
 	opacity: 1;
 	border: 2px solid #000;
 }
@@ -125,9 +139,9 @@ body {
 .spec-box {
 	margin-top: 30px;
 	background: white;
-	border-radius: 16px;
-	padding: 25px;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+	border-radius: 18px;
+	padding: 28px 24px;
+	box-shadow: 0 12px 30px rgba(0,0,0,0.08);
 }
 
 .spec-row {
@@ -153,9 +167,10 @@ body {
 .catalog-btn:hover {
 	background: black;
 	transform: translateY(-3px);
+	color: white;
 }
 
-/* 가격 완전 분리 */
+/* 가격 */
 .price-main {
 	font-size: 34px;
 	font-weight: 900;
@@ -165,15 +180,6 @@ body {
 	letter-spacing: -0.5px;
 }
 
-/* 카드 정리 */
-.spec-box {
-	background: #fff;
-	border-radius: 18px;
-	padding: 28px 24px;
-	box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-}
-
-/* 나머지는 보조 정보 */
 .spec-row strong {
 	font-size: 15px;
 	font-weight: 500;
@@ -191,8 +197,10 @@ body {
 			</div>
 
 			<div style="display: flex; gap: 30px;">
-				<a href="/">회사소개</a> <a href="/vehicle/list">전기차조회</a> <a
-					href="/charging/map">충전소지도</a> <a href="/faq">고객센터</a>
+				<a href="/">회사소개</a>
+				<a href="/vehicle/list">전기차조회</a>
+				<a href="/charging/map">충전소지도</a>
+				<a href="/faq">고객센터</a>
 			</div>
 
 			<div>
@@ -205,39 +213,26 @@ body {
 
 		<div class="row">
 
-			<!-- 🔥 이미지 영역 -->
+			<!-- 이미지 영역 -->
 			<div class="col-md-8">
 
-				<div id="carCarousel" class="carousel slide">
+				<div class="car-image">
+					<img th:if="${vehicle.imageUrl != null and !#strings.isEmpty(vehicle.imageUrl)}"
+						 th:src="@{${vehicle.imageUrl}}"
+						 th:alt="${vehicle.modelName}"
+						 class="slide-img">
 
-					<div class="carousel-inner car-image">
-
-						<div class="carousel-item" th:each="img, stat : ${images}"
-							th:classappend="${stat.index == 0} ? ' active'">
-
-							<img th:src="${img.imageUrl}" class="slide-img">
-						</div>
-
+					<div th:if="${vehicle.imageUrl == null or #strings.isEmpty(vehicle.imageUrl)}"
+						 class="image-empty">
+						차량 이미지가 없습니다.
 					</div>
-
-					<button class="carousel-control-prev" type="button"
-						data-bs-target="#carCarousel" data-bs-slide="prev">
-						<span class="carousel-control-prev-icon"></span>
-					</button>
-
-					<button class="carousel-control-next" type="button"
-						data-bs-target="#carCarousel" data-bs-slide="next">
-						<span class="carousel-control-next-icon"></span>
-					</button>
-
 				</div>
 
-				<!--  썸네일 -->
-				<div class="thumbnail-wrap">
-					<img th:each="img, stat : ${images}" th:src="${img.imageUrl}"
-						class="thumbnail-img"
-						th:classappend="${stat.index == 0} ? ' active'"
-						th:attr="data-index=${stat.index}">
+				<div class="thumbnail-wrap"
+					 th:if="${vehicle.imageUrl != null and !#strings.isEmpty(vehicle.imageUrl)}">
+					<img th:src="@{${vehicle.imageUrl}}"
+						 th:alt="${vehicle.modelName}"
+						 class="thumbnail-img active">
 				</div>
 
 			</div>
@@ -250,14 +245,14 @@ body {
 
 					<div class="wishlist" id="wishlistBtn"
 						th:data-id="${vehicle.vehicleId}">
-						<span th:if="${vehicle.wished}">❤️</span> <span
-							th:unless="${vehicle.wished}">🤍</span>
+						<span th:if="${vehicle.wished}">❤️</span>
+						<span th:unless="${vehicle.wished}">🤍</span>
 					</div>
 				</div>
 
 				<div style="color: #777; margin-top: 10px;">
-					<span th:text="${vehicle.brand}"></span> | <span
-						th:text="${vehicle.vehicleClass}"></span>
+					<span th:text="${vehicle.brand}"></span> |
+					<span th:text="${vehicle.vehicleClass}"></span>
 				</div>
 
 				<div class="spec-box">
@@ -267,28 +262,31 @@ body {
 					</div>
 
 					<div class="spec-row">
-						<span>1회충전 주행거리</span> <strong
-							th:text="${vehicle.drivingRange} + 'km'"></strong>
+						<span>1회충전 주행거리</span>
+						<strong th:text="${vehicle.drivingRange} + 'km'"></strong>
 					</div>
 
 					<div class="spec-row">
-						<span>충전시간</span> <strong th:text="${vehicle.fastChargingTime}"></strong>
+						<span>충전시간</span>
+						<strong th:text="${vehicle.fastChargingTime}"></strong>
 					</div>
 
 					<div class="spec-row">
-						<span>충전방식</span> <strong class="badge-custom"
-							th:text="${vehicle.chargingMethod}"></strong>
+						<span>충전방식</span>
+						<strong th:text="${vehicle.chargingMethod}"></strong>
 					</div>
 
 					<div class="spec-row">
-						<span>배터리</span> <strong
-							th:text="${vehicle.batteryCapacity} + ' kWh'"></strong>
+						<span>배터리</span>
+						<strong th:text="${vehicle.batteryCapacity} + ' kWh'"></strong>
 					</div>
 
 				</div>
 
-				<a th:href="@{${vehicle.catalogUrl}}" target="_blank"
-					class="catalog-btn"> 카탈로그 보기 ↗ </a>
+				<a th:if="${vehicle.catalogUrl != null and !#strings.isEmpty(vehicle.catalogUrl)}"
+				   th:href="@{${vehicle.catalogUrl}}"
+				   target="_blank"
+				   class="catalog-btn">카탈로그 보기 ↗</a>
 
 			</div>
 		</div>
@@ -302,37 +300,23 @@ body {
 	<script>
 'use strict';
 
-/* 썸네일 클릭 → 슬라이드 이동 */
-const thumbnails = document.querySelectorAll('.thumbnail-img');
-const carousel = document.querySelector('#carCarousel');
+const wishlistBtn = document.getElementById("wishlistBtn");
 
-thumbnails.forEach((thumb, index) => {
-	thumb.addEventListener('click', () => {
+if (wishlistBtn) {
+	wishlistBtn.addEventListener("click", function () {
+		const vehicleId = this.dataset.id;
+		const isWished = this.textContent.trim() === "❤️";
+		const url = isWished ? "/wishlist/delete" : "/wishlist/add";
 
-		document.querySelectorAll('.carousel-item').forEach(el => el.classList.remove('active'));
-		document.querySelectorAll('.thumbnail-img').forEach(el => el.classList.remove('active'));
-
-		document.querySelectorAll('.carousel-item')[index].classList.add('active');
-		thumb.classList.add('active');
+		fetch(url, {
+			method: "POST",
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: `vehicleId=${encodeURIComponent(vehicleId)}`
+		}).then(() => {
+			this.textContent = isWished ? "🤍" : "❤️";
+		});
 	});
-});
-
-/* 위시리스트 */
-document.getElementById("wishlistBtn").addEventListener("click", function () {
-
-	const vehicleId = this.dataset.id;
-	const isWished = this.textContent.trim() === "❤️";
-
-	const url = isWished ? "/wishlist/delete" : "/wishlist/add";
-
-	fetch(url, {
-		method: "POST",
-		headers: { "Content-Type": "application/x-www-form-urlencoded" },
-		body: `vehicleId=${vehicleId}`
-	}).then(() => {
-		this.textContent = isWished ? "🤍" : "❤️";
-	});
-});
+}
 </script>
 
 	<script
