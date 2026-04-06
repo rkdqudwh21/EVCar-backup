@@ -28,19 +28,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? item.imageUrl
             : '/images/evcar_logo.png';
 
+        const detailUrl = item.detailUrl && item.detailUrl.trim() !== ''
+            ? item.detailUrl
+            : `/vehicle/${item.vehicleId}`;
+
         article.innerHTML = `
-            <div class="ev-wishlist-card__image-wrap">
-                <img class="ev-wishlist-card__image" src="${imageSrc}" alt="${item.modelName}">
+            <div class="ev-wishlist-image-wrap">
+                <img class="ev-wishlist-image" src="${imageSrc}" alt="${item.modelName ?? '차량 이미지'}">
             </div>
 
-            <div class="ev-wishlist-card__body">
-                <p class="ev-wishlist-card__brand">${item.brand ?? ''}</p>
-                <h3 class="ev-wishlist-card__title">${item.modelName ?? ''}</h3>
-                <p class="ev-wishlist-card__class">${item.vehicleClass ?? ''}</p>
-                <p class="ev-wishlist-card__price">${formatPrice(item.priceBasic)}</p>
+            <div class="ev-wishlist-body">
+                <p class="ev-wishlist-brand">${item.brand ?? ''}</p>
+                <h3 class="ev-wishlist-model">${item.modelName ?? ''}</h3>
+                <p class="ev-wishlist-brand">${item.vehicleClass ?? ''}</p>
+                <p class="ev-wishlist-price">${formatPrice(item.priceBasic)}</p>
 
-                <div class="ev-wishlist-card__actions">
-                    <a class="btn btn-ev-primary" href="${item.detailUrl ?? '#'}">상세보기</a>
+                <div class="ev-wishlist-actions">
+                    <a class="btn btn-ev-primary" href="${detailUrl}">상세보기</a>
                     <button type="button"
                             class="btn btn-ev-danger"
                             data-wishlist-id="${item.wishlistId}">
@@ -77,6 +81,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 items = items.filter((wishlistItem) => wishlistItem.wishlistId !== wishlistId);
+
+                if (visibleCount > items.length && visibleCount > 6) {
+                    visibleCount = Math.max(6, Math.ceil(items.length / 6) * 6);
+                }
+
                 render();
             } catch (error) {
                 console.error(error);
