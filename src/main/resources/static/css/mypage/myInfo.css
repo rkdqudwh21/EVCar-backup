@@ -221,3 +221,25 @@
 .ev-myinfo-subsection--password .ev-myinfo-help--password {
     margin-top: 8px;
 }
+.ev-myinfo-error-box {
+    margin-bottom: 24px;
+    padding: 16px 18px;
+    border: 1px solid #f1b0b7;
+    border-radius: 12px;
+    background-color: #fff3f3;
+}
+
+.ev-myinfo-error-box__title {
+    margin: 0 0 6px;
+    color: #c62828;
+    font-size: 0.98rem;
+    font-weight: 700;
+}
+
+.ev-myinfo-error-box__text {
+    margin: 0;
+    color: #c62828;
+    font-size: 0.94rem;
+    line-height: 1.6;
+    word-break: keep-all;
+}

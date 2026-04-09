@@ -73,15 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const alertAndFocus = (message, element) => {
-        showFormMessage(message, 'error');
+	const alertAndFocus = (message, element) => {
+	    showFormMessage(message, 'error');
 
-        if (element) {
-            element.focus();
-        }
+	    const messageBox = document.getElementById('formMessageBox');
+	    if (messageBox) {
+	        messageBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+	    }
 
-        return false;
-    };
+	    return false;
+	};
 
     const getInputValue = (input) => input?.value?.trim() ?? '';
 

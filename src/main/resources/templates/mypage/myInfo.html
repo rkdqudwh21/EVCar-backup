@@ -41,15 +41,31 @@
 						</div>
 
 						<div class="ev-myinfo-card ev-mypage-card">
+
+							<div class="ev-myinfo-error-box"
+								th:if="${infoErrorMessage != null}"
+								id="infoErrorBox">
+								<div class="ev-myinfo-error-box__title">입력 내용을 다시 확인해주세요.</div>
+								<p class="ev-myinfo-error-box__text"
+									th:text="${infoErrorMessage}">
+									오류 메시지가 표시됩니다.
+								</p>
+							</div>
+
 							<div class="ev-myinfo-grid">
 								<div class="ev-myinfo-field">
-									<label class="ev-myinfo-label">이름</label> <input type="text"
-										class="ev-input ev-myinfo-input" th:field="*{name}" readonly>
+									<label class="ev-myinfo-label">이름</label>
+									<input type="text"
+										class="ev-input ev-myinfo-input"
+										th:field="*{name}"
+										readonly>
 								</div>
 
 								<div class="ev-myinfo-field">
-									<label class="ev-myinfo-label">생년월일</label> <input type="date"
-										class="ev-input ev-myinfo-input" id="birthDate"
+									<label class="ev-myinfo-label">생년월일</label>
+									<input type="date"
+										class="ev-input ev-myinfo-input"
+										id="birthDate"
 										name="birthDate"
 										th:value="${myPageInfo.birthDate != null ? #temporals.format(myPageInfo.birthDate, 'yyyy-MM-dd') : ''}"
 										readonly>
@@ -58,156 +74,189 @@
 								<div class="ev-myinfo-field">
 									<label class="ev-myinfo-label">성별</label>
 									<div class="ev-myinfo-radio-group is-disabled">
-										<label class="ev-myinfo-radio"> <input type="radio"
-											th:field="*{gender}" value="남" disabled> <span>남</span>
-										</label> <label class="ev-myinfo-radio"> <input type="radio"
-											th:field="*{gender}" value="여" disabled> <span>여</span>
+										<label class="ev-myinfo-radio">
+											<input type="radio" th:field="*{gender}" value="남" disabled>
+											<span>남</span>
+										</label>
+										<label class="ev-myinfo-radio">
+											<input type="radio" th:field="*{gender}" value="여" disabled>
+											<span>여</span>
 										</label>
 									</div>
 								</div>
 
 								<div class="ev-myinfo-field">
-									<label class="ev-myinfo-label">전화번호</label> <input type="text"
-										class="ev-input ev-myinfo-input" th:field="*{phone}"
-										id="phone" data-editable="true" inputmode="tel" maxlength="16"
+									<label class="ev-myinfo-label">전화번호</label>
+									<input type="text"
+										class="ev-input ev-myinfo-input"
+										th:field="*{phone}"
+										id="phone"
+										data-editable="true"
+										inputmode="tel"
+										maxlength="16"
 										placeholder="숫자만 입력 (예: 01012345678 또는 +821012345678)"
 										readonly>
-									<p class="ev-myinfo-help">전화번호는 숫자만 입력하며, 국제번호는 맨 앞에 +를 사용할
-										수 있습니다.</p>
+									<p class="ev-myinfo-help">
+										전화번호는 숫자만 입력하며, 국제번호는 맨 앞에 +를 사용할 수 있습니다.
+									</p>
 								</div>
 
 								<div class="ev-myinfo-field ev-myinfo-field--full">
-									<label class="ev-myinfo-label">주소</label> <input type="text"
-										class="ev-input ev-myinfo-input" th:field="*{address}"
-										data-editable="true" readonly>
+									<label class="ev-myinfo-label">주소</label>
+									<input type="text"
+										class="ev-input ev-myinfo-input"
+										th:field="*{address}"
+										data-editable="true"
+										readonly>
 								</div>
 
 								<div class="ev-myinfo-field ev-myinfo-field--full">
-									<label class="ev-myinfo-label">상세 주소</label> <input type="text"
-										class="ev-input ev-myinfo-input" th:field="*{addressDetail}"
-										data-editable="true" maxlength="255" readonly
+									<label class="ev-myinfo-label">상세 주소</label>
+									<input type="text"
+										class="ev-input ev-myinfo-input"
+										th:field="*{addressDetail}"
+										data-editable="true"
+										maxlength="255"
+										readonly
 										placeholder="상세 주소를 입력해주세요.">
 								</div>
 
 								<div class="ev-myinfo-field">
-									<label class="ev-myinfo-label">이메일</label> <input type="email"
-										class="ev-input ev-myinfo-input" th:field="*{email}"
-										data-editable="true" readonly>
+									<label class="ev-myinfo-label">이메일</label>
+									<input type="email"
+										class="ev-input ev-myinfo-input"
+										th:field="*{email}"
+										data-editable="true"
+										readonly>
 								</div>
 
 								<div class="ev-myinfo-field ev-myinfo-field--full">
-									<label class="ev-myinfo-label">현재 비밀번호 <span
-										class="ev-required">*</span></label> <input type="password"
-										class="ev-input ev-myinfo-input" th:field="*{currentPassword}"
-										data-editable="true" maxlength="20" readonly>
+									<label class="ev-myinfo-label">현재 비밀번호 <span class="ev-required">*</span></label>
+									<input type="password"
+										class="ev-input ev-myinfo-input"
+										th:field="*{currentPassword}"
+										data-editable="true"
+										maxlength="20"
+										readonly>
 
-									<div class="ev-myinfo-required-box">회원정보 수정 또는 비밀번호 변경 시
-										현재 비밀번호 입력은 필수입니다.</div>
+									<div class="ev-myinfo-required-box">
+										회원정보 수정 또는 비밀번호 변경 시 현재 비밀번호 입력은 필수입니다.
+									</div>
 								</div>
-<div class="ev-myinfo-field ev-myinfo-field--full">
-    <div class="ev-myinfo-subsection ev-myinfo-subsection--password">
-        <h3 class="ev-myinfo-subsection__title">비밀번호 변경</h3>
-        <p class="ev-myinfo-subsection__description">
-            비밀번호를 변경할 경우에만 입력해주세요.
-        </p>
 
-        <div class="ev-myinfo-subgrid">
-            <div class="ev-myinfo-field">
-                <label class="ev-myinfo-label">새 비밀번호</label>
-                <input
-                    type="password"
-                    class="ev-input ev-myinfo-input"
-                    th:field="*{newPassword}"
-                    data-editable="true"
-                    maxlength="20"
-                    readonly
-                    pattern="^[A-Za-z0-9]{8,20}$"
-                    placeholder="영문/숫자 포함 8~20자">
-            </div>
-
-            <div class="ev-myinfo-field">
-                <label class="ev-myinfo-label">새 비밀번호 확인</label>
-                <input
-                    type="password"
-                    class="ev-input ev-myinfo-input"
-                    th:field="*{newPasswordConfirm}"
-                    data-editable="true"
-                    maxlength="20"
-                    readonly
-                    placeholder="새 비밀번호를 다시 입력해주세요.">
-            </div>
-        </div>
-
-        <p class="ev-myinfo-help ev-myinfo-help--password">
-            비밀번호는 영문과 숫자를 포함하여 8~20자로 입력해주세요.
-        </p>
-    </div>
-</div>
-
-										
-
-									<div class="ev-myinfo-field ev-myinfo-field--full">
-										<label class="ev-myinfo-label">보유 차량 여부</label>
-										<div class="ev-myinfo-radio-group is-disabled"
-											id="hasVehicleGroup">
-											<label class="ev-myinfo-radio"> <input type="radio"
-												th:field="*{hasVehicle}" value="yes" disabled> <span>있음</span>
-											</label> <label class="ev-myinfo-radio"> <input type="radio"
-												th:field="*{hasVehicle}" value="no" disabled> <span>없음</span>
-											</label>
-										</div>
-										
-										<p class="ev-myinfo-help">
-											보유 차량이 있는 경우에만 아래 정보를 입력해주세요.<br> 보유 차량이 없으면 해당 정보는 저장되지
-											않습니다.
+								<div class="ev-myinfo-field ev-myinfo-field--full">
+									<div class="ev-myinfo-subsection ev-myinfo-subsection--password">
+										<h3 class="ev-myinfo-subsection__title">비밀번호 변경</h3>
+										<p class="ev-myinfo-subsection__description">
+											비밀번호를 변경할 경우에만 입력해주세요.
 										</p>
 
+										<div class="ev-myinfo-subgrid">
+											<div class="ev-myinfo-field">
+												<label class="ev-myinfo-label">새 비밀번호</label>
+												<input
+													type="password"
+													class="ev-input ev-myinfo-input"
+													th:field="*{newPassword}"
+													data-editable="true"
+													maxlength="20"
+													readonly
+													pattern="^[A-Za-z0-9]{8,20}$"
+													placeholder="영문/숫자 포함 8~20자">
+											</div>
 
+											<div class="ev-myinfo-field">
+												<label class="ev-myinfo-label">새 비밀번호 확인</label>
+												<input
+													type="password"
+													class="ev-input ev-myinfo-input"
+													th:field="*{newPasswordConfirm}"
+													data-editable="true"
+													maxlength="20"
+													readonly
+													placeholder="새 비밀번호를 다시 입력해주세요.">
+											</div>
+										</div>
+
+										<p class="ev-myinfo-help ev-myinfo-help--password">
+											비밀번호는 영문과 숫자를 포함하여 8~20자로 입력해주세요.
+										</p>
+									</div>
+								</div>
+
+								<div class="ev-myinfo-field ev-myinfo-field--full">
+									<label class="ev-myinfo-label">보유 차량 여부</label>
+									<div class="ev-myinfo-radio-group is-disabled"
+										id="hasVehicleGroup">
+										<label class="ev-myinfo-radio">
+											<input type="radio" th:field="*{hasVehicle}" value="yes" disabled>
+											<span>있음</span>
+										</label>
+										<label class="ev-myinfo-radio">
+											<input type="radio" th:field="*{hasVehicle}" value="no" disabled>
+											<span>없음</span>
+										</label>
 									</div>
 
-									<div class="ev-myinfo-field ev-myinfo-field--full">
-										<div class="ev-myinfo-subsection">
-											<h3 class="ev-myinfo-subsection__title">보유 차량 정보</h3>
+									<p class="ev-myinfo-help">
+										보유 차량이 있는 경우에만 아래 정보를 입력해주세요.<br>
+										보유 차량이 없으면 해당 정보는 저장되지 않습니다.
+									</p>
+								</div>
 
-											<div class="ev-myinfo-subgrid">
-												<div class="ev-myinfo-field">
-													<label class="ev-myinfo-label">보유 차량명</label> <input
-														type="text"
+								<div class="ev-myinfo-field ev-myinfo-field--full">
+									<div class="ev-myinfo-subsection">
+										<h3 class="ev-myinfo-subsection__title">보유 차량 정보</h3>
+
+										<div class="ev-myinfo-subgrid">
+											<div class="ev-myinfo-field">
+												<label class="ev-myinfo-label">보유 차량명</label>
+												<input
+													type="text"
+													class="ev-input ev-myinfo-input ev-vehicle-owned-field"
+													th:field="*{vehicleModel}"
+													data-editable="true"
+													readonly
+													placeholder="예: 아이오닉 5">
+											</div>
+
+											<div class="ev-myinfo-field">
+												<label class="ev-myinfo-label">보유차종 연식</label>
+												<input
+													type="text"
+													class="ev-input ev-myinfo-input ev-vehicle-owned-field"
+													th:field="*{vehicleYear}"
+													data-editable="true"
+													readonly
+													inputmode="numeric"
+													maxlength="7"
+													placeholder="예: 202305 (입력 시 2023-05로 표시)">
+
+												<p class="ev-myinfo-help">
+													숫자만 입력하면 YYYY-MM 형식으로 표시됩니다.<br>
+													월은 01~12, 미래 연월은 입력할 수 없습니다.
+												</p>
+											</div>
+
+											<div class="ev-myinfo-field ev-myinfo-field--full">
+												<label class="ev-myinfo-label">주행거리</label>
+												<div class="ev-myinfo-input-with-unit">
+													<input
+														type="number"
 														class="ev-input ev-myinfo-input ev-vehicle-owned-field"
-														th:field="*{vehicleModel}" data-editable="true" readonly
-														placeholder="예: 아이오닉 5">
-												</div>
-
-												<div class="ev-myinfo-field">
-													<label class="ev-myinfo-label">보유차종 연식</label> <input
-														type="text"
-														class="ev-input ev-myinfo-input ev-vehicle-owned-field"
-														th:field="*{vehicleYear}" data-editable="true" readonly
-														inputmode="numeric" maxlength="7"
-														placeholder="예: 202305 (입력 시 2023-05로 표시)">
-
-													<p class="ev-myinfo-help">
-														숫자만 입력하면 YYYY-MM 형식으로 표시됩니다.<br> 월은 01~12, 미래 연월은 입력할
-														수 없습니다.
-													</p>
-												</div>
-
-												<div class="ev-myinfo-field ev-myinfo-field--full">
-													<label class="ev-myinfo-label">주행거리</label>
-													<div class="ev-myinfo-input-with-unit">
-														<input type="number"
-															class="ev-input ev-myinfo-input ev-vehicle-owned-field"
-															th:field="*{drivingDistance}" data-editable="true"
-															readonly placeholder="예: 15000"> <span
-															class="ev-myinfo-input-unit">km</span>
-													</div>
+														th:field="*{drivingDistance}"
+														data-editable="true"
+														readonly
+														placeholder="예: 15000">
+													<span class="ev-myinfo-input-unit">km</span>
 												</div>
 											</div>
 										</div>
 									</div>
-
 								</div>
+
 							</div>
+						</div>
 					</form>
 				</div>
 			</div>
@@ -222,11 +271,14 @@
 	<script th:src="@{/js/common/footer.js}"></script>
 	<script th:src="@{/js/mypage/myInfo.js}"></script>
 	<script th:inline="javascript">
-		const infoErrorMessage = /*[[${infoErrorMessage}]]*/null;
-		const message = /*[[${message}]]*/null;
+		const infoErrorMessage = /*[[${infoErrorMessage}]]*/ null;
+		const message = /*[[${message}]]*/ null;
 
 		if (infoErrorMessage !== null) {
-			alert(infoErrorMessage);
+			const errorBox = document.getElementById('infoErrorBox');
+			if (errorBox) {
+				errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
 		}
 
 		if (message !== null) {

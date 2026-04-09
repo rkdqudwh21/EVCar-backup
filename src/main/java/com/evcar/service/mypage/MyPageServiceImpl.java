@@ -15,7 +15,8 @@ import com.evcar.repository.consultation.ConsultationRepository;
 import com.evcar.repository.inquiry.InquiryRepository;
 import com.evcar.repository.user.UserRepository;
 import com.evcar.repository.vehicle.VehicleRepository;
-import com.evcar.repository.vehicle.WishlistRepository;
+import com.evcar.repository.wishlist.WishlistRepository;
+
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;

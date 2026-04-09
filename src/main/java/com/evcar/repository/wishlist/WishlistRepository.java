@@ -1,4 +1,4 @@
-package com.evcar.repository.vehicle;
+package com.evcar.repository.wishlist;
 
 import java.util.List;
 import java.util.Optional;
