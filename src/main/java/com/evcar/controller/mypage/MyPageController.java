@@ -249,19 +249,13 @@ public class MyPageController {
     }
 
     private String getUserId(HttpSession session) {
-        Object userId = session.getAttribute("userId");
-        if (userId != null) {
-            return String.valueOf(userId);
-        }
-
         Object loginUser = session.getAttribute("loginUser");
-        if (loginUser instanceof User user) {
-            return user.getUserId();
+        if (!(loginUser instanceof User user)) {
+            return null;
         }
 
-        return null;
+        return user.getUserId();
     }
-
     private MyPageInfoResponseDto getRequiredMyPageInfo(Model model, String userId) {
         Object info = model.getAttribute("myPageInfo");
         if (info instanceof MyPageInfoResponseDto responseDto) {
