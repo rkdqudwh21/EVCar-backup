@@ -1,6 +1,6 @@
 package com.evcar.service.vehicle;
 
-import com.evcar.domain.vehicle.Wishlist;
+import com.evcar.domain.wishlist.Wishlist;
 import com.evcar.dto.vehicle.VehicleListDto;
 import com.evcar.repository.vehicle.VehicleRepository;
 import com.evcar.repository.vehicle.WishlistRepository;

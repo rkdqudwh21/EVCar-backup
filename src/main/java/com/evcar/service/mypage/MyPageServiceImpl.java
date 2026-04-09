@@ -3,7 +3,7 @@ package com.evcar.service.mypage;
 import com.evcar.domain.consultation.Consultation;
 import com.evcar.domain.inquiry.Inquiry;
 import com.evcar.domain.user.User;
-import com.evcar.domain.vehicle.Wishlist;
+import com.evcar.domain.wishlist.Wishlist;
 import com.evcar.dto.mypage.MyConsultationResponseDto;
 import com.evcar.dto.mypage.MyInquiryResponseDto;
 import com.evcar.dto.mypage.MyPageInfoResponseDto;

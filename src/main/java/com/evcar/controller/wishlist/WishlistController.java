@@ -1,4 +1,4 @@
-package com.evcar.controller.vehicle;
+package com.evcar.controller.wishlist;
 
 import com.evcar.service.vehicle.WishlistService;
 import jakarta.servlet.http.HttpSession;

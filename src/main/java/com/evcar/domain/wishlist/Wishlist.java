@@ -1,4 +1,4 @@
-package com.evcar.domain.vehicle;
+package com.evcar.domain.wishlist;
 
 import jakarta.persistence.*;
 import lombok.Getter;
